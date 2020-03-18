@@ -8,8 +8,8 @@ from gi.repository import Pango
 
 from sugar3 import profile
 
-from conf import conf
-import parse_mirc
+from .conf import conf
+from . import parse_mirc
 
 # Window activity Constants
 HILIT = 'h'
@@ -406,10 +406,9 @@ def get_iter_at_coords(view, x, y):
     mouseClickPos = view.get_iter_at_location(
                         *view.window_to_buffer_coords(
                             Gtk.TextWindowType.TEXT, int(x), int(y)))
-    if Gtk.check_version(3, 19, 8) is None:
-        if not mouseClickPos[0]:
-            return False
-        mouseClickPos = mouseClickPos[1]
+    #if not mouseClickPos[0]:
+    #    return False
+    mouseClickPos = mouseClickPos[1]
 
     return mouseClickPos
 
@@ -500,7 +499,7 @@ class TextOutput(Gtk.TextView):
 
     # the unknowing print weird things to our text widget function
     def write(self, text, line_ending='\n', fg=None):
-        if not isinstance(text, unicode):
+        if not isinstance(text, str):
             try:
                 text = codecs.utf_8_decode(text)[0]
             except:
@@ -514,7 +513,7 @@ class TextOutput(Gtk.TextView):
                         "foreground",
                         isinstance(
                             fg,
-                            basestring) and (
+                            str) and (
                             '#%s' %
                             fg) or parse_mirc.get_mirc_color(fg)),
                     'from': 0,
@@ -597,6 +596,7 @@ class TextOutput(Gtk.TextView):
             self.clear_hover()
 
         hover_iter = get_iter_at_coords(self, *self.hover_coords)
+        print(f"hover iter: {hover_iter}")
 
         if not hover_iter.ends_line():
             h_data = get_event_at_iter(self, hover_iter, self.core)
@@ -869,7 +869,7 @@ class UrkUITabs(Gtk.VBox):
         self.tabs.set_current_page(self.tabs.page_num(window))
 
     def add(self, window):
-        for pos in reversed(range(self.tabs.get_n_pages())):
+        for pos in reversed(list(range(self.tabs.get_n_pages()))):
             if self.tabs.get_nth_page(pos).network == window.network:
                 break
         else:

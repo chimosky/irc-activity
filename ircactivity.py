@@ -16,6 +16,9 @@
 # Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
 # MA 02110-1301  USA
 
+import gi
+gi.require_version("Gtk", "3.0")
+
 import logging
 from gettext import gettext as _
 
@@ -23,7 +26,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 
 import json
-import ConfigParser
+import configparser
 import os
 
 from sugar3.activity import activity
@@ -162,7 +165,7 @@ class IRCActivity(activity.Activity):
     def read_defaults_from_config(self, config_file):
         logging.debug('Reading configuration from file %s' % config_file)
         fp = open(config_file)
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         try:
             config.readfp(fp)
             fp.close()
@@ -207,7 +210,7 @@ class IRCActivity(activity.Activity):
             self.client.add_channel(chan)
             self.client.add_channel_other(chan)
         self.client.core.window.network.requested_joins = set()
-        for winid in data['scrollback'].keys():
+        for winid in list(data['scrollback'].keys()):
             if winid in data['channels']:
                 win = purk.windows.new(purk.windows.ChannelWindow,
                                        self.client.core.window.network,
